@@ -197,7 +197,7 @@
     window.location.href = 'login.html';
   }
 
-  // ✅ Guardar usuario al iniciar sesión (desde tu login.html)
+  //
 async function loginUsuario(nombre) {
   const resp = await fetch('login.php', {
     method: 'POST',
@@ -214,7 +214,7 @@ async function loginUsuario(nombre) {
   }
 }
 
-// ✅ Llamar a esta función cuando un juego termina
+// 
 async function juegoTerminado(puntosGanados) {
   const nombre = localStorage.getItem('usuario');
   if (!nombre) {
@@ -250,3 +250,4 @@ juegoTerminado(10); // suma 10 puntos
   </script>
 </body>
 </html>
+
