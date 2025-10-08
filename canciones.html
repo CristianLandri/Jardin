@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Canciones para Docentes</title>
+  <link rel="stylesheet" href="Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/css/bootstrap.min.css">
+</head>
+<body class="p-4 bg-light">
+  <h2>Canciones para el Jardín 🎶</h2>
+  <p>Esta sección está disponible solo para docentes.</p>
+  <ul>
+    <li><a href="#">La vaca Lola</a></li>
+    <li><a href="#">Los pollitos dicen</a></li>
+    <li><a href="#">El sapo Pepe</a></li>
+  </ul>
+
+  <button class="btn btn-danger mt-3" onclick="salir()">Cerrar sesión</button>
+
+  <script>
+    function salir() {
+      localStorage.removeItem('docente');
+      localStorage.removeItem('registro_id');
+      window.location.href = 'login_docentes.html';
+    }
+  </script>
+</body>
+</html>

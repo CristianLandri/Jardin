@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Docente</title>
+  <link rel="stylesheet" href="Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f5f5f5;
+    }
+    #sidebar {
+      height: 100vh;
+      background-color: #198754;
+      color: white;
+      padding-top: 20px;
+    }
+    #sidebar a {
+      color: white;
+      text-decoration: none;
+      display: block;
+      padding: 10px 20px;
+    }
+    #sidebar a:hover {
+      background-color: #157347;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Menú lateral -->
+      <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+        <h4 class="text-center mb-4">Panel del Docente</h4>
+        <p class="text-center fw-bold" id="nombreDocente"></p>
+        <hr>
+        <a href="canciones.html">🎵 Canciones</a>
+        <a href="#" id="cerrarSesion">🚪 Cerrar sesión</a>
+      </nav>
+
+      <!-- Contenido principal -->
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+      <h2>Tabla de puntos de los alumnos</h2>
+<table id="tablaPuntos" border="1" cellpadding="8" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Nombre del alumno</th>
+      <th>Puntos</th>
+      <th>Última actualización</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+
+
+
+
+  <script>
+    // Verificar si hay un docente logueado
+    const docente = localStorage.getItem('docente');
+    if (!docente) {
+      alert('Acceso restringido. Iniciá sesión primero.');
+      window.location.href = 'login_docentes.html';
+    } else {
+      document.getElementById('nombreDocente').textContent = docente;
+    }
+
+    // Botón de cerrar sesión
+    document.getElementById('cerrarSesion').addEventListener('click', () => {
+      localStorage.removeItem('docente');
+      localStorage.removeItem('registro_id');
+      window.location.href = 'login_docentes.html';
+    });
+  </script>
+ <script>
+async function cargarPuntos() {
+  try {
+    const respuesta = await fetch("obtener_puntos.php");
+    const datos = await respuesta.json();
+
+    const tabla = document.querySelector("#tablaPuntos tbody");
+    tabla.innerHTML = "";
+
+    datos.forEach(fila => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${fila.nombre}</td>
+        <td id="puntos-${fila.id}">${fila.puntos}</td>
+        <td>${fila.ultima_actualizacion}</td>
+        <td>
+          <button onclick="actualizarPuntos(${fila.id}, 1)">+1</button>
+          <button onclick="actualizarPuntos(${fila.id}, -1)">-1</button>
+        </td>
+      `;
+      tabla.appendChild(tr);
+    });
+
+  } catch (error) {
+    console.error("Error al cargar puntos:", error);
+  }
+}
+
+async function actualizarPuntos(id, cambio) {
+  try {
+    const formData = new FormData();
+    formData.append("usuario_id", id);
+    formData.append("puntos", cambio);
+
+    const respuesta = await fetch("actualizar_puntos.php", {
+      method: "POST",
+      body: formData
+    });
+
+    const texto = await respuesta.text();
+    console.log(texto);
+
+    // Recargar los puntos actualizados
+    cargarPuntos();
+
+  } catch (error) {
+    console.error("Error al actualizar puntos:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", cargarPuntos);
+</script>
+</body>
+</html>

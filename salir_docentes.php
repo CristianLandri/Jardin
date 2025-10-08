@@ -7,21 +7,14 @@ $db = 'jardin';
 
 $conn = new mysqli($host, $user, $pass, $db);
 
-if ($conn->connect_error) {
-    echo json_encode(['error' => $conn->connect_error]);
-    exit;
-}
-
 $registro_id = $_POST['registro_id'] ?? '';
 if ($registro_id) {
-    $hora_salida = date('Y-m-d H:i:s');
-    $stmt = $conn->prepare("UPDATE registros_docentes SET hora_salida = ? WHERE id = ?");
-    $stmt->bind_param("si", $hora_salida, $registro_id);
-    $stmt->execute();
-    echo json_encode(['ok' => true]);
+  $hora_salida = date('Y-m-d H:i:s');
+  $stmt = $conn->prepare("UPDATE registros_docentes SET hora_salida = ? WHERE id = ?");
+  $stmt->bind_param("si", $hora_salida, $registro_id);
+  $stmt->execute();
+  echo json_encode(['ok' => true]);
 } else {
-    echo json_encode(['error' => 'Falta registro_id']);
+  echo json_encode(['error' => 'Falta registro_id']);
 }
-
-$conn->close();
 ?>
