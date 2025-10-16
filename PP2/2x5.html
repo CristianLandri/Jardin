@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juego de Memoria 2x5</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chewy&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body {
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fbc2eb, #a6c1ee);
+    background-size: 400% 400%;
+    animation: fondo 12s ease infinite;
+    font-family: 'Chewy', cursive;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+  }
+
+  @keyframes fondo {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+  }
+
+  h1 {
+    font-size: 2.8rem;
+    color: #fff;
+    text-shadow: 3px 3px 0 #ff69b4, 6px 6px 10px rgba(0,0,0,0.3);
+    margin-bottom: 15px;
+  }
+
+  #timerBarContainer {
+    width: 90%;
+    height: 25px;
+    background-color: #ffe6f2;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  }
+
+  #timerBar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+    transition: width 0.2s linear;
+  }
+
+  .memory-card {
+    aspect-ratio: 1/1;
+    background-color: #ffb6c1;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    cursor: pointer;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease, box-shadow 0.3s;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+  }
+
+  .memory-card:hover {
+    transform: scale(1.05);
+  }
+
+  .memory-card.flipped {
+    background-color: #fff;
+    transform: rotateY(180deg);
+  }
+
+  .memory-card .front, .memory-card .back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .memory-card .back {
+    background-color: #ff6f61;
+  }
+
+  .memory-card .front {
+    transform: rotateY(180deg);
+  }
+
+  #gameBoard {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    width: min(90%, 600px);
+  }
+  
+  .modal-content {
+    background-color: #fff0f5;
+    border-radius: 20px;
+    border: 3px solid #ff69b4;
+    text-align: center;
+  }
+
+  #modalTitle {
+    color: #ff4081;
+    font-size: 2rem;
+    text-shadow: 2px 2px 0 #fff;
+  }
+
+  #modalEmoji {
+    font-size: 3rem;
+  }
+
+  button.btn {
+    border-radius: 15px;
+    background-color: #ff80ab;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    transition: transform 0.2s, background 0.2s;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+  }
+
+  button.btn:hover {
+    transform: scale(1.1);
+    background-color: #ff4081;
+  }
+</style>
+</head>
+<body>
+
+<h1>🎉 Juego de Memoria 🍎</h1>
+
+<div id="timerBarContainer">
+  <div id="timerBar"></div>
+</div>
+
+<div id="gameBoard"></div>
+
+<!-- Modal Fin -->
+<div class="modal fade" id="endModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-4">
+      <h2 id="modalTitle"></h2>
+      <div id="modalEmoji" class="my-3"></div>
+      <div id="modalButtons" class="d-flex justify-content-center gap-3 flex-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Audios -->
+<audio id="flipSound" src="flip.mp3" preload="auto"></audio>
+<audio id="matchSound" src="match.mp3" preload="auto"></audio>
+<audio id="failSound" src="fail.mp3" preload="auto"></audio>
+<audio id="winSound" src="win.mp3" preload="auto"></audio>
+<audio id="loseSound" src="lose.mp3" preload="auto"></audio>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const symbols = ["🍎","🍌","🍇","🍒","🍉"];
+let cards = [...symbols, ...symbols].sort(() => 0.5 - Math.random());
+
+const gameBoard = document.getElementById("gameBoard");
+const timerBar = document.getElementById("timerBar");
+const endModal = new bootstrap.Modal(document.getElementById('endModal'));
+const modalTitle = document.getElementById('modalTitle');
+const modalEmoji = document.getElementById('modalEmoji');
+const modalButtons = document.getElementById('modalButtons');
+
+let firstCard = null;
+let lockBoard = true; // Bloqueado hasta que empiece
+let matches = 0;
+let timer = 20;
+const maxTime = 20;
+let timerInterval;
+
+// Crear tablero
+cards.forEach(symbol => {
+  const card = document.createElement("div");
+  card.className = "memory-card";
+  card.innerHTML = `
+    <div class="front">${symbol}</div>
+    <div class="back">❓</div>
+  `;
+  gameBoard.appendChild(card);
+  card.addEventListener("click", () => flipCard(card, symbol));
+});
+
+// Mostrar todas las cartas al inicio por 8 segundos
+const allCards = document.querySelectorAll(".memory-card");
+allCards.forEach(card => card.classList.add("flipped"));
+setTimeout(() => {
+  allCards.forEach(card => card.classList.remove("flipped"));
+  lockBoard = false;
+  startTimer();
+}, 5000);
+
+function flipCard(card, symbol) {
+  if (lockBoard || card.classList.contains("flipped")) return;
+  document.getElementById("flipSound").play();
+  card.classList.add("flipped");
+
+  if (!firstCard) {
+    firstCard = { card, symbol };
+    return;
+  }
+
+  if (firstCard.symbol === symbol) {
+    document.getElementById("matchSound").play();
+    matches++;
+    timer = Math.min(timer + 3, maxTime);
+    updateTimerBar();
+    firstCard = null;
+    if (matches === symbols.length) endGame(true);
+  } else {
+    document.getElementById("failSound").play();
+    lockBoard = true;
+    setTimeout(() => {
+      card.classList.remove("flipped");
+      firstCard.card.classList.remove("flipped");
+      firstCard = null;
+      lockBoard = false;
+    }, 1000);
+  }
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timer--;
+    updateTimerBar();
+    if (timer <= 0) endGame(false);
+  }, 1000);
+}
+
+function updateTimerBar() {
+  const percent = (timer / maxTime) * 100;
+  timerBar.style.width = percent + "%";
+  timerBar.style.backgroundColor = percent < 40 ? "#ff1744" : "#4caf50";
+}
+
+function endGame(win) {
+  clearInterval(timerInterval);
+  document.getElementById(win ? "winSound" : "loseSound").play();
+  modalTitle.textContent = win ? "¡Ganaste! 🌟" : "¡Se acabó el tiempo! ⏰";
+  modalEmoji.textContent = win ? "🎉😄👏" : "😢💔";
+
+  modalButtons.innerHTML = `
+    <button class="btn" onclick="location.reload()">Jugar de nuevo</button>
+    ${win ? '<button class="btn" onclick="window.location.href=\'3x4.html\'">Siguiente juego ➡️</button>' : ''}
+  `;
+  endModal.show();
+}
+
+function resetGame() {
+  location.reload();
+}
+</script>
+</body>
+</html>
