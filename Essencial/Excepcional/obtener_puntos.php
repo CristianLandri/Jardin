@@ -5,7 +5,7 @@ if ($conexion->connect_error) {
     die("Error de conexión: " . $conexion->connect_error);
 }
 
-// Si se envía un nombre, trae solo los puntos de ese usuario (para el alumno)
+
 if (isset($_POST['nombre'])) {
     $nombre = $conexion->real_escape_string($_POST['nombre']);
 
@@ -16,12 +16,12 @@ if (isset($_POST['nombre'])) {
         $fila = $resultado->fetch_assoc();
         echo json_encode($fila);
     } else {
-        // Si no existe, se crea el usuario con 0 puntos
+
         $conexion->query("INSERT INTO usuarios (nombre, puntos) VALUES ('$nombre', 0)");
         echo json_encode(["nombre" => $nombre, "puntos" => 0]);
     }
 } 
-// Si NO se manda un nombre, devuelve todos los usuarios (para el panel de docente)
+
 else {
     $sql = "SELECT nombre, puntos, NOW() AS ultima_actualizacion FROM usuarios ORDER BY puntos DESC";
     $resultado = $conexion->query($sql);
@@ -39,3 +39,4 @@ else {
 
 $conexion->close();
 ?>
+
