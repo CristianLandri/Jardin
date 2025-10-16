@@ -63,7 +63,7 @@
 <body>
   <div class="container-fluid">
     <div class="row">
-      <!-- 🔹 MENÚ LATERAL -->
+      <!--  MENÚ LATERAL -->
       <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
         <h4 class="text-center mb-4">Panel del Docente</h4>
         <p class="text-center fw-bold" id="nombreDocente"></p>
@@ -72,7 +72,7 @@
         <a href="#" id="cerrarSesion">🚪 Cerrar sesión</a>
       </nav>
 
-      <!-- 🔹 CONTENIDO PRINCIPAL -->
+      <!--  CONTENIDO PRINCIPAL -->
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
         <div class="container-fluid">
           <h2 class="mb-4 text-success text-center">Tabla de puntos de los alumnos</h2>
@@ -99,7 +99,7 @@
 
   <script src="/Jardin/Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- 🔹 CONTROL DE SESIÓN -->
+  <!--  CONTROL DE SESIÓN -->
   <script>
     const docente = localStorage.getItem('docente');
     if (!docente) {
@@ -116,7 +116,7 @@
     });
   </script>
 
-  <!-- 🔹 TABLA DE PUNTOS -->
+  <!--  TABLA DE PUNTOS -->
   <script>
   async function cargarPuntos() {
     try {
@@ -211,3 +211,4 @@ window.onload = cargarPuntos;
 
 </body>
 </html>
+
