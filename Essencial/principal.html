@@ -215,27 +215,7 @@ async function loginUsuario(nombre) {
   }
 }
 
-// ✅ Llamar a esta función cuando un juego termina
-async function juegoTerminado(puntosGanados) {
-  const nombre = localStorage.getItem('usuario');
-  if (!nombre) {
-    alert("Iniciá sesión primero.");
-    return;
-  }
 
-  const resp = await fetch('Excepcional/sumar_puntos.php', {
-    method: 'POST',
-    body: new URLSearchParams({ nombre, puntos: puntosGanados })
-  });
-  const data = await resp.json();
-
-  if (!data.error) {
-    console.log(`Puntos actualizados: ${data.puntos}`);
-    localStorage.setItem('puntos', data.puntos);
-  } else {
-    console.error(data.error);
-  }
-}
 
 // Ejemplo: llamalo cuando el juego termine
 // juegoTerminado(10);
@@ -244,9 +224,20 @@ if(!docente) {
   window.location.href = 'login_docentes.html';
 }
 
+async function juegoTerminado(puntosGanados) {
+  const nombre = localStorage.getItem('usuario');
+
+  const resp = await fetch('Excepcional/sumar_puntos.php', {
+    method: 'POST',
+    body: new URLSearchParams({ nombre, puntos: puntosGanados })
+  });
+  
+  const data = await resp.json();
+  console.log('Puntos actualizados:', data.puntos);
+}
 
 
-juegoTerminado(10); // suma 10 puntos
+//juegoTerminado(10); // suma 10 puntos
 
 
 async function obtenerPuntos() {

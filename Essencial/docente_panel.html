@@ -4,31 +4,66 @@
   <meta charset="UTF-8">
   <title>Panel Docente</title>
   <link rel="stylesheet" href="/Jardin/Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/css/bootstrap.min.css">
+
   <style>
     body {
       background-color: #f5f5f5;
+      overflow-x: hidden;
     }
+
     #sidebar {
       height: 100vh;
       background-color: #198754;
       color: white;
       padding-top: 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
     }
+
     #sidebar a {
       color: white;
       text-decoration: none;
       display: block;
       padding: 10px 20px;
     }
+
     #sidebar a:hover {
       background-color: #157347;
+    }
+
+    main {
+      margin-left: 250px;
+      padding: 20px;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+      }
+
+      main {
+        margin-left: 0;
+      }
+
+      table {
+        font-size: 14px;
+      }
+    }
+
+    table th {
+      background-color: #198754;
+      color: white;
     }
   </style>
 </head>
 <body>
   <div class="container-fluid">
     <div class="row">
-      <!-- Menú lateral -->
+      <!-- 🔹 MENÚ LATERAL -->
       <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
         <h4 class="text-center mb-4">Panel del Docente</h4>
         <p class="text-center fw-bold" id="nombreDocente"></p>
@@ -37,27 +72,35 @@
         <a href="#" id="cerrarSesion">🚪 Cerrar sesión</a>
       </nav>
 
-      <!-- Contenido principal -->
+      <!-- 🔹 CONTENIDO PRINCIPAL -->
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-      <h2>Tabla de puntos de los alumnos</h2>
-<table id="tablaPuntos" border="1" cellpadding="8" cellspacing="0">
-  <thead>
-    <tr>
-      <th>Nombre del alumno</th>
-      <th>Puntos</th>
-      <th>Última actualización</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+        <div class="container-fluid">
+          <h2 class="mb-4 text-success text-center">Tabla de puntos de los alumnos</h2>
 
+          <div class="table-responsive">
+            <table id="tablaPuntos" class="table table-striped table-bordered text-center align-middle">
+              <thead>
+                <tr>
+                  <th>Nombre del alumno</th>
+                  <th>Puntos</th>
+                  <th>Última actualización</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="4">Cargando datos...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
 
+  <script src="/Jardin/Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"></script>
 
-
-
+  <!-- 🔹 CONTROL DE SESIÓN -->
   <script>
-    // Verificar si hay un docente logueado
     const docente = localStorage.getItem('docente');
     if (!docente) {
       alert('Acceso restringido. Iniciá sesión primero.');
@@ -66,64 +109,105 @@
       document.getElementById('nombreDocente').textContent = docente;
     }
 
-    // Botón de cerrar sesión
     document.getElementById('cerrarSesion').addEventListener('click', () => {
       localStorage.removeItem('docente');
       localStorage.removeItem('registro_id');
       window.location.href = 'login_docentes.html';
     });
   </script>
- <script>
-async function cargarPuntos() {
-  try {
-    const respuesta = await fetch("Excepcional/obtener_puntos.php");
-    const datos = await respuesta.json();
 
-    const tabla = document.querySelector("#tablaPuntos tbody");
-    tabla.innerHTML = "";
+  <!-- 🔹 TABLA DE PUNTOS -->
+  <script>
+  async function cargarPuntos() {
+    try {
+      const respuesta = await fetch("Excepcional/obtener_puntos.php");
+      const datos = await respuesta.json();
 
-    datos.forEach(fila => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${fila.nombre}</td>
-        <td id="puntos-${fila.id}">${fila.puntos}</td>
-        <td>${fila.ultima_actualizacion}</td>
-        <td>
-          <button onclick="actualizarPuntos(${fila.id}, 1)">+1</button>
-          <button onclick="actualizarPuntos(${fila.id}, -1)">-1</button>
-        </td>
-      `;
-      tabla.appendChild(tr);
-    });
+      const tabla = document.querySelector("#tablaPuntos tbody");
+      tabla.innerHTML = "";
 
-  } catch (error) {
-    console.error("Error al cargar puntos:", error);
+      if (datos.length === 0) {
+        tabla.innerHTML = '<tr><td colspan="4">No hay registros aún.</td></tr>';
+        return;
+      }
+
+      datos.forEach(fila => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${fila.nombre}</td>
+          <td id="puntos-${fila.id}">${fila.puntos}</td>
+          <td>${fila.ultima_actualizacion}</td>
+          <td>
+            <button class="btn btn-sm btn-success me-1" onclick="actualizarPuntos(${fila.id}, 1)">+1</button>
+            <button class="btn btn-sm btn-danger" onclick="actualizarPuntos(${fila.id}, -1)">-1</button>
+          </td>
+        `;
+        tabla.appendChild(tr);
+      });
+
+    } catch (error) {
+      console.error("Error al cargar puntos:", error);
+      document.querySelector("#tablaPuntos tbody").innerHTML =
+        '<tr><td colspan="4">Error al cargar datos</td></tr>';
+    }
   }
+
+  async function actualizarPuntos(id, cambio) {
+    try {
+      const formData = new FormData();
+      formData.append("usuario_id", id);
+      formData.append("puntos", cambio);
+
+      const respuesta = await fetch("Excepcional/actualizar_puntos.php", {
+        method: "POST",
+        body: formData
+      });
+
+      const texto = await respuesta.text();
+      console.log("Respuesta del servidor:", texto);
+
+      // Recargar los puntos actualizados
+      cargarPuntos();
+
+    } catch (error) {
+      console.error("Error al actualizar puntos:", error);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", cargarPuntos);
+  </script>
+  <script>
+function cargarPuntos() {
+    fetch('obtener_puntos.php')
+        .then(response => response.json())
+        .then(data => {
+            const tabla = document.getElementById('tabla-puntos');
+            tabla.innerHTML = '';
+
+            if (data.length === 0) {
+                tabla.innerHTML = `<tr><td colspan="4">No hay registros aún.</td></tr>`;
+                return;
+            }
+
+            data.forEach(fila => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${fila.nombre_alumno}</td>
+                    <td>${fila.puntos}</td>
+                    <td>${fila.ultima_actualizacion}</td>
+                    <td>
+                        <button class="btn-ver">👁️ Ver</button>
+                    </td>
+                `;
+                tabla.appendChild(tr);
+            });
+        });
 }
 
-async function actualizarPuntos(id, cambio) {
-  try {
-    const formData = new FormData();
-    formData.append("usuario_id", id);
-    formData.append("puntos", cambio);
-
-    const respuesta = await fetch("Excepcional/actualizar_puntos.php", {
-      method: "POST",
-      body: formData
-    });
-
-    const texto = await respuesta.text();
-    console.log(texto);
-
-    // Recargar los puntos actualizados
-    cargarPuntos();
-
-  } catch (error) {
-    console.error("Error al actualizar puntos:", error);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", cargarPuntos);
+// Cargar automáticamente cada 10 segundos
+setInterval(cargarPuntos, 10000);
+window.onload = cargarPuntos;
 </script>
+
 </body>
 </html>
