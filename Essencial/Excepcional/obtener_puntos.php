@@ -16,7 +16,7 @@ if (isset($_POST['nombre'])) {
         $fila = $resultado->fetch_assoc();
         echo json_encode($fila);
     } else {
-
+        
         $conexion->query("INSERT INTO usuarios (nombre, puntos) VALUES ('$nombre', 0)");
         echo json_encode(["nombre" => $nombre, "puntos" => 0]);
     }
@@ -39,4 +39,3 @@ else {
 
 $conexion->close();
 ?>
-

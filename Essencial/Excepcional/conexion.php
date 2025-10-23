@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = ""; // dejar vacío si usás XAMPP
+$password = ""; 
 $database = "jardin_db";
 
 $conn = new mysqli($servername, $username, $password, $database);

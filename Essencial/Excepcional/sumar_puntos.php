@@ -41,4 +41,3 @@ echo json_encode(['ok' => true, 'puntos' => $puntosTotales]);
 
 $conn->close();
 ?>
-
