@@ -24,7 +24,7 @@
       return;
     }
 
-    const puntos = 10; // puntos por completar
+    const puntos = 10; 
     const resp = await fetch('../Essencial/Excepcional/sumar_puntos.php', {
       method: 'POST',
       body: new URLSearchParams({ nombre, puntos })

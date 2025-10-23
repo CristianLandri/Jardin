@@ -31,7 +31,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   const nombre = document.getElementById('usuario').value;
 
   try {
-    const resp = await fetch('../Essencial/Excepcional/login.php', {  // ruta corregida
+    const resp = await fetch('../Essencial/Excepcional/login.php', { 
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'

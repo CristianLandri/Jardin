@@ -2,26 +2,169 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Canciones para Docentes</title>
   <link rel="stylesheet" href="/Jardin/Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/css/bootstrap.min.css">
+  <style>
+    .video-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: .6rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      background: #000;
+    }
+    .video-card video {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+    @media (min-width: 768px) {
+      .video-card video { height: 180px; }
+    }
+    .video-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      padding: .8rem;
+      background: linear-gradient(0deg, rgba(0,0,0,0.5), transparent 50%);
+      color: #fff;
+    }
+    .video-title { font-weight: 700; text-shadow: 0 2px 6px rgba(0,0,0,0.6); }
+    .btn-small { padding: .35rem .6rem; font-size: .85rem; }
+  </style>
 </head>
-<body class="p-4 bg-light">
-  <h2>Canciones para el Jardín 🎶</h2>
-  <p>Esta sección está disponible solo para docentes.</p>
-  <ul>
-    <li><a href="#">La vaca Lola</a></li>
-    <li><a href="#">Los pollitos dicen</a></li>
-    <li><a href="#">El sapo Pepe</a></li>
-  </ul>
+<body class="bg-light">
 
-  <button class="btn btn-danger mt-3" onclick="salir()">Cerrar sesión</button>
+  <nav class="navbar navbar-expand-lg navbar-success bg-success text-white mb-4">
+    <div class="container">
+      <a class="navbar-brand text-white" href="#">Jardín - Canciones</a>
+      <div class="d-flex ms-auto align-items-center">
+        <div class="me-3 text-white">Docente: <strong id="docenteNombre">---</strong></div>
+        <button id="btnSalir" class="btn btn-outline-light btn-sm">Cerrar sesión</button>
+      </div>
+    </div>
+  </nav>
 
+  <main class="container">
+    <header class="mb-3">
+      <h2 class="h4">Canciones para el Jardín 🎶</h2>
+      <p class="text-muted">Selecciona una canción para reproducirla o ver una vista previa. Esta sección es para docentes.</p>
+    </header>
+
+    <div class="row g-3">
+      <!-- Card 1 -->
+      <div class="col-12 col-sm-6 col-md-4">
+        <div class="video-card">
+          <video muted autoplay loop playsinline preload="metadata" poster="/Jardin/Static/img/memoria.jpg">
+            <source src="/Jardin/Static/videos/vaca_lola.mp4" type="video/mp4">
+          </video>
+          <div class="video-overlay w-100">
+            <div class="w-100 d-flex justify-content-between align-items-end">
+              <div class="video-title">La Vaca Lola</div>
+              <div>
+                <button class="btn btn-sm btn-primary btn-small play-btn" data-src="/Jardin/Static/videos/vaca_lola.mp4">Reproducir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="col-12 col-sm-6 col-md-4">
+        <div class="video-card">
+          <video muted autoplay loop playsinline preload="metadata" poster="/Jardin/Static/img/memoria.jpg">
+            <source src="/Jardin/Static/videos/pollitos.mp4" type="video/mp4">
+          </video>
+          <div class="video-overlay w-100">
+            <div class="w-100 d-flex justify-content-between align-items-end">
+              <div class="video-title">Los Pollitos Dicen</div>
+              <div>
+                <button class="btn btn-sm btn-primary btn-small play-btn" data-src="/Jardin/Static/videos/pollitos.mp4">Reproducir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="col-12 col-sm-6 col-md-4">
+        <div class="video-card">
+          <video muted autoplay loop playsinline preload="metadata" poster="/Jardin/Static/img/memoria.jpg">
+            <source src="/Jardin/Static/videos/sapo_pepe.mp4" type="video/mp4">
+          </video>
+          <div class="video-overlay w-100">
+            <div class="w-100 d-flex justify-content-between align-items-end">
+              <div class="video-title">El Sapo Pepe</div>
+              <div>
+                <button class="btn btn-sm btn-primary btn-small play-btn" data-src="/Jardin/Static/videos/sapo_pepe.mp4">Reproducir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Puedes duplicar más tarjetas abajo -->
+    </div>
+  </main>
+
+  <!-- Modal reproducir -->
+  <div class="modal fade" id="videoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-dark">
+        <div class="modal-body p-0 position-relative">
+          <button type="button" class="btn-close position-absolute top-2 end-2 m-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          <video id="modalVideo" controls style="width:100%; height:100%; background:#000" playsinline></video>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/Jardin/Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    function salir() {
+    // Validar docente
+    const docente = localStorage.getItem('docente');
+    const docenteNombre = localStorage.getItem('usuario') || 'Docente';
+    if (!docente) {
+      // si no es docente, redirige al login de docentes
+      window.location.href = 'login_docentes.html';
+    }
+    document.getElementById('docenteNombre').textContent = docenteNombre;
+
+    // Cerrar sesión
+    document.getElementById('btnSalir').addEventListener('click', () => {
       localStorage.removeItem('docente');
       localStorage.removeItem('registro_id');
       window.location.href = 'login_docentes.html';
-    }
+    });
+
+    // Modal video
+    const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
+    const modalVideo = document.getElementById('modalVideo');
+
+    document.querySelectorAll('.play-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const src = btn.getAttribute('data-src');
+        if (!src) return;
+        modalVideo.src = src;
+        modalVideo.play().catch(()=>{});
+        videoModal.show();
+      });
+    });
+
+    // Cuando se cierra el modal, parar y limpiar src
+    document.getElementById('videoModal').addEventListener('hidden.bs.modal', () => {
+      modalVideo.pause();
+      modalVideo.src = '';
+    });
+
+    // Para dispositivos táctiles: tocar la tarjeta pausará/reproducirá la vista previa
+    document.querySelectorAll('.video-card video').forEach(v => {
+      v.addEventListener('click', () => {
+        if (v.paused) v.play(); else v.pause();
+      });
+    });
   </script>
 </body>
 </html>
