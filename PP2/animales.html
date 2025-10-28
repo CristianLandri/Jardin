@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adivina el animal por el sonido</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fuente divertida -->
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+
+  <style>
+  body {
+    background: linear-gradient(135deg, #ffffff, #fff000, #ffffff);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    font-family: 'Fredoka One', cursive;
+    text-align: center;
+    padding: 20px;
+  }
+
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  h1 {
+    color: #FF5F00;
+    font-size: 2.4rem;
+    text-shadow: 2px 2px 0 white;
+    margin-bottom: 15px;
+  }
+
+  .play-btn {
+    background: #FF7B00;
+    color: white;
+    border: none;
+    font-size: 1.6rem;
+    padding: 18px 38px;
+    border-radius: 25px;
+    box-shadow: 0 4px 0 #cc6100;
+    transition: transform 0.15s;
+  }
+
+  .play-btn:active {
+    transform: scale(0.95);
+  }
+
+  .animal-card img {
+    width: 100%;
+    max-width: 160px;
+    border-radius: 20px;
+    border: 5px solid white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.25);
+    cursor: pointer;
+    transition: transform .2s;
+  }
+
+  .animal-card img:hover {
+    transform: scale(1.12);
+    border-color: #FF7B00;
+  }
+
+  #message {
+    font-size: 2rem;
+    margin-top: 20px;
+    min-height: 50px;
+    color: #ff00a8;
+    text-shadow: 2px 2px white;
+  }
+</style>
+</head>
+<body>
+
+  <h1>🎧 Escuchá y elegí el animal correcto 🐾</h1>
+
+  <button id="playSound" class="btn btn-warning play-btn">🔊 Reproducir sonido</button>
+
+  <div class="container mt-4">
+    <div class="row g-3" id="animalOptions">
+      <!-- Opciones se generan con JS -->
+    </div>
+  </div>
+
+  <div id="message"></div>
+<script>
+  const animals = [
+    { name: "León", img: "images/leon3.webp", sound: "sounds/leon.mp3" },
+    { name: "Vaca", img: "images/vaca.jpg", sound: "sounds/vaca.mp3" },
+    { name: "Perro", img: "images/perro.jpg", sound: "sounds/perro.mp3" },
+    { name: "Elefante", img: "images/elefante2.jpg", sound: "sounds/elefante.mp3" },
+    { name: "Gallina", img: "images/gallina.png", sound: "sounds/gallina.mp3" },
+    { name: "Oveja", img: "images/oveja.jpeg", sound: "sounds/oveja.mp3" }
+  ];
+
+  let correctAnimal = null;
+
+  function loadRound() {
+    document.getElementById("message").innerHTML = "";
+
+    correctAnimal = animals[Math.floor(Math.random() * animals.length)];
+
+    const shuffled = animals.sort(() => Math.random() - 0.5);
+
+    const row = document.getElementById("animalOptions");
+    row.innerHTML = "";
+    shuffled.forEach(a => {
+      row.innerHTML += `
+        <div class="col-4 animal-card">
+          <img src="${a.img}" alt="${a.name}" onclick="checkAnswer('${a.name}')">
+          <p><b>${a.name}</b></p>
+        </div>
+      `;
+    });
+  }
+
+  function checkAnswer(selected) {
+    if (selected === correctAnimal.name) {
+      document.getElementById("message").innerHTML = "😊 ¡Muy bien!";
+      new Audio("sounds/correct.mp3").play(); // sonido victoria
+      setTimeout(loadRound, 1500);
+    } else {
+      document.getElementById("message").innerHTML = "😅 Ups... probá otra vez.";
+      new Audio("sounds/incorrect.mp3").play(); // sonido error
+    }
+  }
+
+  // ✅ ESTA FUNCIÓN DEBE ESTAR AFUERA
+  document.getElementById("playSound").onclick = () => {
+    new Audio(correctAnimal.sound).play();
+  };
+
+  loadRound();
+</script>
+</body>
+</html>
