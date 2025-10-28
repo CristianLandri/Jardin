@@ -58,13 +58,13 @@
       <div class="col-12 col-sm-6 col-md-4">
         <div class="video-card">
           <video muted autoplay loop playsinline preload="metadata" poster="/Jardin/Static/img/memoria.jpg">
-            <source src="/Jardin/Static/videos/vaca_lola.mp4" type="video/mp4">
+            <source src="../videos/La Vaca Lola - Canciones de La Granja de Zenón 2.mp4" type="video/mp4">
           </video>
           <div class="video-overlay w-100">
             <div class="w-100 d-flex justify-content-between align-items-end">
               <div class="video-title">La Vaca Lola</div>
               <div>
-                <button class="btn btn-sm btn-primary btn-small play-btn" data-src="/Jardin/Static/videos/vaca_lola.mp4">Reproducir</button>
+                <button class="btn btn-sm btn-primary btn-small play-btn" data-src="../videos/La Vaca Lola - Canciones de La Granja de Zenón 2.mp4">Reproducir</button>
               </div>
             </div>
           </div>
@@ -75,13 +75,13 @@
       <div class="col-12 col-sm-6 col-md-4">
         <div class="video-card">
           <video muted autoplay loop playsinline preload="metadata" poster="/Jardin/Static/img/memoria.jpg">
-            <source src="/Jardin/Static/videos/pollitos.mp4" type="video/mp4">
+            <source src="../videos/Los Pollitos Dicen ♫ Canciones Infantiles ♫ Plim Plim.mp4" type="video/mp4">
           </video>
           <div class="video-overlay w-100">
             <div class="w-100 d-flex justify-content-between align-items-end">
               <div class="video-title">Los Pollitos Dicen</div>
               <div>
-                <button class="btn btn-sm btn-primary btn-small play-btn" data-src="/Jardin/Static/videos/pollitos.mp4">Reproducir</button>
+                <button class="btn btn-sm btn-primary btn-small play-btn" data-src="../videos/Los Pollitos Dicen ♫ Canciones Infantiles ♫ Plim Plim.mp4">Reproducir</button>
               </div>
             </div>
           </div>
@@ -92,24 +92,23 @@
       <div class="col-12 col-sm-6 col-md-4">
         <div class="video-card">
           <video muted autoplay loop playsinline preload="metadata" poster="/Jardin/Static/img/memoria.jpg">
-            <source src="/Jardin/Static/videos/sapo_pepe.mp4" type="video/mp4">
+            <source src="../videos/El Sapo Pepe - Las Canciones de la Granja de Zenón 2.mp4" type="video/mp4">
           </video>
           <div class="video-overlay w-100">
             <div class="w-100 d-flex justify-content-between align-items-end">
               <div class="video-title">El Sapo Pepe</div>
               <div>
-                <button class="btn btn-sm btn-primary btn-small play-btn" data-src="/Jardin/Static/videos/sapo_pepe.mp4">Reproducir</button>
+                <button class="btn btn-sm btn-primary btn-small play-btn" data-src="../videos/El Sapo Pepe - Las Canciones de la Granja de Zenón 2.mp4">Reproducir</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Puedes duplicar más tarjetas abajo -->
+
     </div>
   </main>
 
-  <!-- Modal reproducir -->
   <div class="modal fade" id="videoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content bg-dark">
@@ -123,23 +122,23 @@
 
   <script src="/Jardin/Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Validar docente
+
     const docente = localStorage.getItem('docente');
     const docenteNombre = localStorage.getItem('usuario') || 'Docente';
     if (!docente) {
-      // si no es docente, redirige al login de docentes
+    
       window.location.href = 'login_docentes.html';
     }
     document.getElementById('docenteNombre').textContent = docenteNombre;
 
-    // Cerrar sesión
+
     document.getElementById('btnSalir').addEventListener('click', () => {
       localStorage.removeItem('docente');
       localStorage.removeItem('registro_id');
       window.location.href = 'login_docentes.html';
     });
 
-    // Modal video
+
     const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
     const modalVideo = document.getElementById('modalVideo');
 
@@ -153,13 +152,13 @@
       });
     });
 
-    // Cuando se cierra el modal, parar y limpiar src
+  
     document.getElementById('videoModal').addEventListener('hidden.bs.modal', () => {
       modalVideo.pause();
       modalVideo.src = '';
     });
 
-    // Para dispositivos táctiles: tocar la tarjeta pausará/reproducirá la vista previa
+x
     document.querySelectorAll('.video-card video').forEach(v => {
       v.addEventListener('click', () => {
         if (v.paused) v.play(); else v.pause();
