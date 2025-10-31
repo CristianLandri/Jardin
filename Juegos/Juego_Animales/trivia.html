@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trivia de Animales para Niños</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/Jardin/Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/css/bootstrap.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Chewy&display=swap');
 
@@ -122,31 +122,31 @@
     </div>
   </div>
 
-  <!-- Preparado para sonidos (archivos en la misma carpeta que trivia.html) -->
+  
   <audio id="soundCorrect" src="match.mp3" preload="auto"></audio>
-  <!-- si no existe wrong.mp3, usamos match.mp3 como fallback -->
+  
   <audio id="soundWrong" src="wrong.mp3" preload="auto" onerror="this.src='match.mp3'"></audio>
   <audio id="soundEnd" src="win.mp3" preload="auto"></audio>
 
   <script>
-    // Protección: permitir solo alumnos logueados (no docentes)
+    
     (function(){
       const usuario = localStorage.getItem('usuario');
       const docente = localStorage.getItem('docente');
       if (!usuario) {
-        // Redirigir al login de alumnos si no hay usuario
+        
         window.location.href = '/Jardin/Essencial/login.html';
         return;
       }
-      // Si hay una marca de docente en localStorage pero NO coincide con el usuario
-      // actual, puede ser una clave stale de pruebas anteriores: la ignoramos y la borramos.
+      
+      
       if (docente && docente !== usuario) {
         console.warn('Clave "docente" encontrada pero no coincide con el usuario actual. Limpiando clave stale.');
         localStorage.removeItem('docente');
         return;
       }
-      // Si la marca de docente coincide con el usuario actual, entonces es un docente y no
-      // debe jugar esta trivia.
+      
+      
       if (docente && docente === usuario) {
         alert('Esta trivia está destinada a alumnos. Volviendo al menú principal.');
         window.location.href = '/Jardin/Essencial/Principal.html';
@@ -163,7 +163,9 @@
       {q: '¿Qué animal vive en el agua y tiene ocho brazos?', emoji: '🐙', choices:['Pulpo','Calamar','Pez','Cangrejo'], a:0}
     ];
 
-    let index = 0, score = 0;
+  let index = 0, score = 0;
+  
+  let puntosEnviados = false;
 
     const animalArt = document.getElementById('animalArt');
     const questionEl = document.getElementById('question');
@@ -175,7 +177,7 @@
     const restart = document.getElementById('restart');
     const progBar = document.getElementById('progBar');
 
-    // Sonidos
+    
     const soundCorrect = document.getElementById('soundCorrect');
     const soundWrong = document.getElementById('soundWrong');
     const soundEnd = document.getElementById('soundEnd');
@@ -229,9 +231,10 @@
       finalScore.textContent = `Tu puntaje: ${score} / ${QUESTIONS.length}`;
       finalText.textContent = score === QUESTIONS.length ? '¡Excelente! 🌟' : '¡Muy bien hecho! 🐾';
 
-      // Enviar puntos al servidor en segundo plano (si hay usuario), sin alertas.
+      
       const nombreJugador = localStorage.getItem('usuario');
-      if (nombreJugador) {
+      if (nombreJugador && !puntosEnviados) {
+        puntosEnviados = true; // marcar inmediatamente para evitar duplicados
         fetch('/Jardin/Essencial/Excepcional/sumar_puntos.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -262,12 +265,13 @@
         try { soundEnd.play().catch(()=>{}); } catch(e) {}
       }
 
-      // Configurar botón Salir: envía puntos (si no se enviaron aún) y vuelve al menú principal.
+      
       const exitBtn = document.getElementById('exitBtn');
       if (exitBtn) {
         exitBtn.onclick = async () => {
-          // Intentar enviar de nuevo antes de salir (no mostrar mensajes)
-          if (nombreJugador) {
+          
+          if (nombreJugador && !puntosEnviados) {
+            puntosEnviados = true;
             try {
               const r = await fetch('/Jardin/Essencial/Excepcional/sumar_puntos.php', {
                 method: 'POST',
