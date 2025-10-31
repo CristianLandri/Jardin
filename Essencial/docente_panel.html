@@ -95,7 +95,7 @@
 <body>
   <div class="container-fluid">
     <div class="row">
-      <!-- Top bar for small screens with offcanvas toggle -->
+      
       <div class="col-12 d-md-none bg-success text-white p-2 d-flex justify-content-between align-items-center">
         <div class="fw-bold">Panel del Docente</div>
         <button class="btn btn-light btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
@@ -103,7 +103,7 @@
         </button>
       </div>
 
-      <!-- Offcanvas sidebar for small screens -->
+      
       <div class="offcanvas offcanvas-start bg-success text-white" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title text-white" id="offcanvasSidebarLabel">Panel del Docente</h5>
@@ -117,7 +117,7 @@
         </div>
       </div>
 
-      <!-- Sidebar for md+ -->
+      
       <nav id="sidebar" class="col-md-3 col-lg-2 d-none d-md-block sidebar">
         <h4 class="text-center mb-4">Panel del Docente</h4>
         <p class="text-center fw-bold" id="nombreDocente"></p>
@@ -126,7 +126,7 @@
         <a href="#" id="cerrarSesion">🚪 Cerrar sesión</a>
       </nav>
 
-      <!-- CONTENIDO PRINCIPAL -->
+      
       <main class="col-12 col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
         <div class="container-fluid">
           <h2 class="mb-4 text-success text-center">Tabla de puntos de los alumnos</h2>
@@ -138,7 +138,7 @@
                   <th>Nombre del alumno</th>
                   <th>Puntos</th>
                   <th>Última actualización</th>
-                  <th>Acciones</th>
+                 
                 </tr>
               </thead>
               <tbody>
@@ -147,9 +147,9 @@
             </table>
           </div>
 
-          <!-- Mobile: cards view -->
+          
           <div id="tablaPuntosMobile" class="d-block d-md-none">
-            <!-- cards se inyectan aquí -->
+            
             <p class="text-center text-muted">Cargando datos...</p>
           </div>
         </div>
@@ -205,8 +205,7 @@
               <td id="puntos-${fila.id}">${fila.puntos}</td>
               <td>${fila.ultima_actualizacion}</td>
               <td>
-                <button class="btn btn-sm btn-success me-1" onclick="actualizarPuntos(${fila.id}, 1)">+1</button>
-                <button class="btn btn-sm btn-danger" onclick="actualizarPuntos(${fila.id}, -1)">-1</button>
+
               </td>
             `;
             tablaBody.appendChild(tr);

@@ -120,7 +120,7 @@
   <div class="container-menu">
     <div class="cont-menu">
       <nav>
-        <a href="canciones.html">Canciones</a>
+        
       </nav>
       <label for="btn-menu">✖️</label>
     </div>
@@ -129,7 +129,7 @@
   <div class="container my-5">
     <div class="d-flex flex-wrap justify-content-center gap-4">
 
-      <!-- Juego 1 -->
+      
 <div class="card shadow text-center" style="width: 16rem;">
   <img src="../img/memory-48118.svg" class="card-img-top img-fluid rounded" alt="Memoria">
   <div class="card-body">
@@ -139,34 +139,28 @@
 </div>
 
 
-      <!-- Juego 2 -->
+      
       <div class="card shadow text-center" style="width: 16rem;">
         <img src="../img/animal-5931286_1920.png" class="card-img-top img-fluid rounded" alt="producto">
         <div class="card-body">
-          <h5 class="card-title">Colorear Animales</h5>
-          <button class="btn btn-success" onclick="jugar('Colorear Animales', 15)">Jugar</button>
+          <h5 class="card-title">Adivinar Animales</h5>
+          
+          <button class="btn btn-success" onclick="window.location.href='/Jardin/Juegos/Animal/animales.html'">Jugar</button>
         </div>
       </div>
 
-      <!-- Juego 3 -->
+      
       <div class="card shadow text-center" style="width: 16rem;">
         <img src="../img/puzzle-7190584.svg" class="card-img-top img-fluid rounded" alt="producto">
         <div class="card-body">
-          <h5 class="card-title">Puzzle de Frutas</h5>
-          <button class="btn btn-success" onclick="jugar('Puzzle de Frutas', 20)">Jugar</button>
+              <h5 class="card-title">Rompecabezas de Animales</h5>
+              <button class="btn btn-success" onclick="window.location.href='/Jardin/Juegos/Puzzle/puzzle.html'">Jugar</button>
         </div>
       </div>
 
-      <!-- Juego 4 -->
-      <div class="card shadow text-center" style="width: 16rem;">
-        <img src="../img/office-158293.svg" class="card-img-top img-fluid rounded" alt="producto">
-        <div class="card-body">
-          <h5 class="card-title">Colores y Formas</h5>
-          <button class="btn btn-success" onclick="jugar('Colores y Formas', 10)">Jugar</button>
-        </div>
-      </div>
+      
 
-      <!-- Juego 5 -->
+      
       <div class="card shadow text-center" style="width: 16rem;">
         <img src="../img/butterflies-7415815.svg" class="card-img-top img-fluid rounded" alt="producto">
         <div class="card-body">
@@ -175,21 +169,13 @@
         </div>
       </div>
 
-      <!-- Juego 6 -->
-      <div class="card shadow text-center" style="width: 16rem;">
-        <img src="../img/heart-151634.svg" class="card-img-top img-fluid rounded" alt="producto">
-        <div class="card-body">
-          <h5 class="card-title">Rompecabezas</h5>
-          <button class="btn btn-success" onclick="jugar('Rompecabezas', 20)">Jugar</button>
-        </div>
-      </div>
+      
 
     </div>
   </div>
 
   <script src="/Jardin/Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"></script>
   <script>
-  // Obtener usuario de localStorage
   const nombre = localStorage.getItem('usuario');
   if(nombre){
     document.getElementById('nombreUsuario').textContent = nombre;
@@ -233,7 +219,7 @@ async function juegoTerminado(puntosGanados) {
 }
 
 
-//juegoTerminado(10); // suma 10 puntos
+ 
 
 
 async function obtenerPuntos() {
