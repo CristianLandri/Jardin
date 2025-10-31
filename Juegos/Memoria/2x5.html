@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Juego de Memoria 2x5</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/Jardin/Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/css/bootstrap.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
   body {
@@ -145,7 +145,7 @@
 
 <div id="gameBoard"></div>
 
-<!-- Modal Fin -->
+ 
 <div class="modal fade" id="endModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content p-4">
@@ -156,14 +156,14 @@
   </div>
 </div>
 
-<!-- Audios -->
+ 
 <audio id="flipSound" src="flip.mp3" preload="auto"></audio>
 <audio id="matchSound" src="match.mp3" preload="auto"></audio>
 <audio id="failSound" src="fail.mp3" preload="auto"></audio>
 <audio id="winSound" src="win.mp3" preload="auto"></audio>
 <audio id="loseSound" src="lose.mp3" preload="auto"></audio>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/Jardin/Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const symbols = ["🍎","🍌","🍇","🍒","🍉"];
 let cards = [...symbols, ...symbols].sort(() => 0.5 - Math.random());
@@ -176,14 +176,14 @@ const modalEmoji = document.getElementById('modalEmoji');
 const modalButtons = document.getElementById('modalButtons');
 
 let firstCard = null;
-let lockBoard = true; // Bloqueado hasta que empiece
+let lockBoard = true; 
 let matches = 0;
-let wrongMatches = 0; // contador de fallos
-let timer = 120;
-const maxTime = 120;
+let wrongMatches = 0; 
+let timer = 40;
+const maxTime = 40;
 let timerInterval;
 
-// Crear tablero
+ 
 cards.forEach(symbol => {
   const card = document.createElement("div");
   card.className = "memory-card";
@@ -195,7 +195,7 @@ cards.forEach(symbol => {
   card.addEventListener("click", () => flipCard(card, symbol));
 });
 
-// Mostrar todas las cartas al inicio por 8 segundos
+ 
 const allCards = document.querySelectorAll(".memory-card");
 allCards.forEach(card => card.classList.add("flipped"));
 setTimeout(() => {
@@ -222,7 +222,7 @@ function flipCard(card, symbol) {
     firstCard = null;
     if (matches === symbols.length) endGame(true);
   } else {
-    // contar fallo
+    
     wrongMatches++;
     document.getElementById("failSound").play();
     lockBoard = true;
@@ -252,34 +252,50 @@ function updateTimerBar() {
 function endGame(win) {
   clearInterval(timerInterval);
   document.getElementById(win ? "winSound" : "loseSound").play();
-  // calcular puntos: base 5 puntos menos fallos, mínimo 1
+  
   let puntosGanados = 0;
   if (win) {
-    puntosGanados = Math.max(1, 5 - wrongMatches);
-    // enviar al servidor
+  puntosGanados = Math.max(1, 6 - wrongMatches);
+    
     sendPoints(puntosGanados);
   }
-  modalTitle.textContent = win ? "¡Ganaste! 🌟" : "¡Se acabó el tiempo! ⏰";
-  modalEmoji.textContent = win ? "🎉😄👏" : "😢💔";
+  modalTitle.textContent = win ? "¡Ganaste! 🌟" : "¡Se acabó el tiempo!";
+  modalEmoji.textContent = win ? "🎉😄👏" : "";
 
-  modalButtons.innerHTML = `
-    <button class="btn" onclick="location.reload()">Jugar de nuevo</button>
-    ${win ? '<button class="btn" onclick="window.location.href=\'3x4.html\'">Siguiente juego ➡️</button>' : ''}
-  `;
-  // Añadir botón para volver al índice
-  modalButtons.innerHTML += `\n    <button class="btn" onclick="window.location.href='index.html'">Volver al inicio</button>`;
+
+  modalButtons.innerHTML = '';
+
+  function makeBtn(text, onClickHandler, extraClass) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn' + (extraClass ? ' ' + extraClass : '');
+    b.textContent = text;
+    b.addEventListener('click', onClickHandler);
+    return b;
+  }
+
+  
+  modalButtons.appendChild(makeBtn('Jugar de nuevo', () => { location.reload(); }));
+
+  
   if (win) {
-    // Añadir texto que muestre puntos ganados
+    modalButtons.appendChild(makeBtn('Siguiente juego ➡️', () => { window.location.href = '/Jardin/Juegos/Memoria/3x4.html'; }));
+  }
+
+
+  modalButtons.appendChild(makeBtn('Volver al inicio', () => { window.location.href = '/Jardin/Juegos/Memoria/index.html'; }));
+  if (win) {
+    
     const info = document.createElement('div');
     info.className = 'w-100 mt-2';
     info.innerHTML = `<small>Has ganado <strong>${puntosGanados}</strong> puntos (fallos: ${wrongMatches})</small>`;
-    // insertar antes del modalButtons
+    
     document.querySelector('#endModal .modal-content').appendChild(info);
   }
   endModal.show();
-  // Redirigir automáticamente al índice de Memoria para elegir otro nivel (2s) SOLO si ganó
+  
   if (win) {
-    // Redirigir después de 10 minutos (600000 ms)
+    
     setTimeout(() => { window.location.href = 'index.html'; }, 600000);
   }
 }
@@ -288,7 +304,7 @@ function resetGame() {
   location.reload();
 }
 
-// Enviar puntos al servidor (usa ruta absoluta para evitar problemas de path)
+ 
 async function sendPoints(points) {
   const nombre = localStorage.getItem('usuario');
   if (!nombre) return console.warn('No hay usuario en localStorage, puntos no enviados');

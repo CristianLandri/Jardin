@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Juego de Memoria 3x4</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/Jardin/Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/css/bootstrap.min.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Chewy&display=swap');
 
@@ -105,7 +105,7 @@
   <div id="gameBoard" class="row g-3 justify-content-center"></div>
 </div>
 
-<!-- Modal Fin de Juego -->
+ 
 <div class="modal fade" id="endModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered text-center">
     <div class="modal-content p-4">
@@ -116,23 +116,23 @@
   </div>
 </div>
 
-<!-- 🎵 Audios -->
+ 
 <audio id="flipSound" src="flip.mp3" preload="auto"></audio>
 <audio id="matchSound" src="match.mp3" preload="auto"></audio>
 <audio id="failSound" src="fail.mp3" preload="auto"></audio>
 <audio id="winSound" src="win.mp3" preload="auto"></audio>
 <audio id="loseSound" src="lose.mp3" preload="auto"></audio>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/Jardin/Static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// CONFIGURACIÓN
+ 
 const symbols = ["🍎","🍌","🍇","🍒","🍉","🍍"];
 let cards = [...symbols, ...symbols];
 cards.sort(() => 0.5 - Math.random());
 
 const gameBoard = document.getElementById("gameBoard");
 
-// Crear 3 filas x 4 columnas
+ 
 for (let i=0; i<3; i++){
   const row = document.createElement("div");
   row.className="row g-3 justify-content-center";
@@ -150,24 +150,24 @@ for (let i=0; i<3; i++){
   gameBoard.appendChild(row);
 }
 
-// VARIABLES
+ 
 let firstCard = null;
 let lockBoard = true;
-let timer = 120;
-const maxTime = 120;
+let timer = 50;
+const maxTime = 50;
 const timerBar = document.getElementById("timerBar");
 let timerInterval = null;
 let matches = 0;
 let wrongMatches = 0; // contador de fallos
 const totalPairs = symbols.length;
 
-// MODAL
+ 
 const endModal = new bootstrap.Modal(document.getElementById('endModal'));
 const modalTitle = document.getElementById('modalTitle');
 const modalButtons = document.getElementById('modalButtons');
 const modalImageContainer = document.getElementById('modalImageContainer');
 
-// FUNCIONES
+ 
 function updateTimerBar() {
   const percentage = (timer/maxTime)*100;
   timerBar.style.width = percentage + "%";
@@ -190,7 +190,7 @@ function checkMatch(card1, card2){
     matches++;
     if(matches===totalPairs) gameOver(true);
   } else {
-    // contar fallo
+    
     wrongMatches++;
     playSound("failSound");
     setTimeout(()=>{
@@ -222,7 +222,7 @@ function gameOver(won){
   modalButtons.innerHTML="";
   modalImageContainer.innerHTML="";
 
-  modalTitle.textContent = won ? "¡Ganaste!!! 🎉" : "¡Perdiste 😢!";
+  modalTitle.textContent = won ? "¡Ganaste!!! 🎉" : "¡Perdiste!";
   modalTitle.style.color = won ? "#28a745" : "#dc3545";
 
   const img = document.createElement("img");
@@ -231,33 +231,31 @@ function gameOver(won){
   img.alt = won ? "Ganaste" : "Perdiste";
   modalImageContainer.appendChild(img);
 
-  const retryBtn = document.createElement("button");
-  retryBtn.className="btn btn-primary";
-  retryBtn.textContent="Reintentar";
-  retryBtn.onclick = ()=> location.reload();
-
-  const homeBtn = document.createElement("button");
-  homeBtn.className="btn btn-secondary";
-  homeBtn.textContent="Volver al inicio";
-  homeBtn.onclick = ()=> location.href="#";
-
-  modalButtons.appendChild(retryBtn);
-  if(won){
-    const nextBtn = document.createElement("button");
-    nextBtn.className="btn btn-success";
-    nextBtn.textContent="Siguiente juego ➡️";
-    nextBtn.onclick = ()=> window.location.href="juegoSiguiente.html";
-    modalButtons.appendChild(nextBtn);
+  // Crear botones programáticamente para mantener event listeners
+  modalButtons.innerHTML = '';
+  function makeBtn(text, handler, cls) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = (cls || 'btn');
+    b.textContent = text;
+    b.addEventListener('click', handler);
+    return b;
   }
-  modalButtons.appendChild(homeBtn);
 
-  // Añadir botón 'Volver al inicio' que lleva al index de Memoria
-  modalButtons.innerHTML += `\n    <button class="btn" onclick="window.location.href='index.html'">Volver al inicio</button>`;
+  // Reintentar
+  modalButtons.appendChild(makeBtn('Reintentar', () => location.reload(), 'btn btn-primary'));
 
-    // calcular puntos: base 5 puntos menos fallos, mínimo 1
-    // Nota: antes se usaba un valor fijo; ahora se calcula según fallos
+  // Siguiente juego
+  if (won) {
+    modalButtons.appendChild(makeBtn('Siguiente juego ➡️', () => { window.location.href = '/Jardin/Juegos/Memoria/4x3.html'; }, 'btn btn-success'));
+  }
+
+  // Volver al índice de Memoria
+  modalButtons.appendChild(makeBtn('Volver al inicio', () => { window.location.href = '/Jardin/Juegos/Memoria/index.html'; }, 'btn btn-secondary'));
+
+    
     if (won) {
-      const puntosGanados = Math.max(1, 5 - wrongMatches);
+  const puntosGanados = Math.max(1, 6 - wrongMatches);
     sendPoints(puntosGanados);
     const info = document.createElement('div');
     info.className = 'w-100 mt-2';
@@ -266,14 +264,14 @@ function gameOver(won){
   }
 
   endModal.show();
-  // Redirigir automáticamente al índice de Memoria para elegir otro nivel (2s) SOLO si ganó
+  
   if (won) {
-    // Redirigir después de 10 minutos (600000 ms)
+    
     setTimeout(() => { window.location.href = 'index.html'; }, 600000);
   }
 }
 
-// Enviar puntos al servidor
+ 
 async function sendPoints(points) {
   const nombre = localStorage.getItem('usuario');
   if (!nombre) return console.warn('No hay usuario en localStorage, puntos no enviados');
@@ -292,7 +290,7 @@ async function sendPoints(points) {
   }
 }
 
-// ANIMACIÓN INICIAL (8 segundos)
+ 
 const allCards = document.querySelectorAll(".memory-card");
 allCards.forEach(card=>card.classList.add("flipped"));
 setTimeout(()=>{
@@ -301,7 +299,7 @@ setTimeout(()=>{
   startTimer();
 },8000);
 
-// CLIC EN CARTAS
+ 
 allCards.forEach(card=>{
   card.addEventListener("click",()=>{
     if(lockBoard || card.classList.contains("flipped")) return;
