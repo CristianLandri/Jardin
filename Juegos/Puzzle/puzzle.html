@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rompecabezas de Animales 🐻🌳</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+    body {
+      background: linear-gradient(to bottom, #a8e6cf 0%, #dcedc1 100%);
+      font-family: 'Fredoka One', cursive;
+      color: #3c3c3c;
+      user-select: none;
+      overflow-x: hidden;
+    }
+    h4 { color: #2e7d32; text-shadow: 1px 1px #fff; }
+    .game-wrap { max-width: 900px; margin: 20px auto; }
+    .card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(var(--cols), 1fr);
+      gap: 10px;
+      touch-action: manipulation;
+    }
+    .tile {
+      aspect-ratio: 1/1;
+      border-radius: 18px;
+      border: 3px solid #8d6e63;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+      background-size: calc(var(--cols) * 100%) calc(var(--cols) * 100%);
+      background-repeat: no-repeat;
+      transition: transform .15s ease, border-color .2s;
+    }
+    .tile.selected { transform: scale(1.05); border-color: #4caf50; }
+    .btn-big { padding: 0.8rem 1rem; font-size: 1.1rem; border-radius: 12px; }
+    .btn-primary { background-color: #81c784; border: none; }
+    .btn-primary:hover { background-color: #66bb6a; }
+    .confetti {
+      position: fixed; width: 10px; height: 10px; background: #ffeb3b;
+      animation: fall 2s linear infinite; z-index: 999;
+    }
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container game-wrap">
+    <div class="card p-3">
+      <h4>🦁 Rompecabezas de Animales 🐘</h4>
+      <p>Cada vez que empieces, aparecerá un animal diferente. ¡Tocá las piezas para ordenarlas!</p>
+
+      <div class="row gy-3">
+        <div class="col-12 col-md-8">
+          <div id="board" class="board"></div>
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label">Tamaño del rompecabezas</label>
+          <select id="sizeSelect" class="form-select mb-3">
+            <option value="2">2 x 2 (fácil)</option>
+            <option value="3" selected>3 x 3</option>
+            <option value="4">4 x 4 (difícil)</option>
+          </select>
+
+          <div class="d-grid gap-2">
+            <button id="startBtn" class="btn btn-primary btn-big">🌳 Iniciar / Reiniciar</button>
+            <button id="solveBtn" class="btn btn-outline-success">🦋 Mostrar solución</button>
+          </div>
+
+          <div id="animalName" class="mt-3 fw-bold text-success text-center fs-5"></div>
+          <div id="moves" class="mt-2">Movimientos: 0</div>
+          <div id="time">Tiempo: 00:00</div>
+          <div id="resultPanel" class="mt-3 text-center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const boardEl = document.getElementById('board');
+    const movesEl = document.getElementById('moves');
+    const timeEl = document.getElementById('time');
+    const sizeSelect = document.getElementById('sizeSelect');
+    const startBtn = document.getElementById('startBtn');
+    const solveBtn = document.getElementById('solveBtn');
+    const animalNameEl = document.getElementById('animalName');
+
+    
+    const animals = [
+      { name: "León", file: "leondibujo.jpg" },
+      { name: "Elefante", file: "elefantedibujo.jpg" },
+      { name: "Tigre", file: "tigredibujo.jpg" },
+      { name: "Cebra", file: "cebradibujo.jpg" },
+      { name: "Mono", file: "monodibujo.jpg" },
+      { name: "Panda", file: "pandadibujo.jpg" },
+      { name: "Jirafa", file: "jirafadibujo.jpg" }
+    ];
+
+    let cols = 3, tiles = [], selected = null, moves = 0, timer = null, startTime = null, imageUrl = "";
+
+    function getRandomAnimal() {
+      const random = animals[Math.floor(Math.random() * animals.length)];
+      animalNameEl.textContent = "🐾 Animal: " + random.name;
+      return "images/" + random.file;
+    }
+
+    function buildBoard() {
+      imageUrl = getRandomAnimal();
+      boardEl.innerHTML = '';
+      cols = parseInt(sizeSelect.value);
+      document.documentElement.style.setProperty('--cols', cols);
+      tiles = [];
+
+      const total = cols * cols;
+      for (let i = 0; i < total; i++) {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.dataset.index = i;
+        tile.dataset.pos = i;
+        const row = Math.floor(i / cols);
+        const col = i % cols;
+        tile.style.backgroundImage = `url('${imageUrl}')`;
+        tile.style.backgroundPosition = `${(col / (cols - 1)) * 100}% ${(row / (cols - 1)) * 100}%`;
+        tile.addEventListener('click', onTileClick);
+        tiles.push(tile);
+      }
+
+      shuffleTiles();
+      renderTiles();
+      moves = 0;
+      updateMoves();
+      resetTimer();
+    }
+
+    function shuffleTiles() {
+      const positions = Array.from({ length: tiles.length }, (_, i) => i);
+      do {
+        for (let i = positions.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [positions[i], positions[j]] = [positions[j], positions[i]];
+        }
+      } while (positions.every((p, i) => p === i));
+      tiles.forEach((t, i) => t.dataset.pos = positions[i]);
+    }
+
+    function renderTiles() {
+      boardEl.innerHTML = '';
+      tiles.sort((a, b) => a.dataset.pos - b.dataset.pos).forEach(t => boardEl.appendChild(t));
+    }
+
+    function onTileClick(e) {
+      const tile = e.currentTarget;
+      if (!startTime) startTimer();
+      if (!selected) {
+        selected = tile;
+        tile.classList.add('selected');
+      } else if (selected === tile) {
+        tile.classList.remove('selected');
+        selected = null;
+      } else {
+        swapTiles(selected, tile);
+        selected.classList.remove('selected');
+        selected = null;
+      }
+    }
+
+    function swapTiles(a, b) {
+      const posA = a.dataset.pos, posB = b.dataset.pos;
+      a.dataset.pos = posB; b.dataset.pos = posA;
+      renderTiles();
+      moves++; updateMoves();
+      if (checkWin()) celebrate();
+    }
+
+    function updateMoves() { movesEl.textContent = 'Movimientos: ' + moves; }
+    function checkWin() { return tiles.every(t => t.dataset.pos === t.dataset.index); }
+
+    function startTimer() {
+      startTime = Date.now();
+      timer = setInterval(() => {
+        const s = Math.floor((Date.now() - startTime) / 1000);
+        timeEl.textContent = 'Tiempo: ' + Math.floor(s / 60).toString().padStart(2, '0') + ':' + (s % 60).toString().padStart(2, '0');
+      }, 1000);
+    }
+    function resetTimer() { clearInterval(timer); timer = null; startTime = null; timeEl.textContent = 'Tiempo: 00:00'; }
+
+    function celebrate() {
+      clearInterval(timer);
+      for (let i = 0; i < 60; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`;
+        c.style.animationDuration = 2 + Math.random() * 2 + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 4000);
+      }
+      
+      let puntosGanados = 6 - Math.floor(moves / cols);
+      puntosGanados = Math.max(1, Math.min(6, puntosGanados));
+
+      
+      const resultPanel = document.getElementById('resultPanel');
+      resultPanel.innerHTML = '';
+      const info = document.createElement('div');
+      info.className = 'fw-bold mb-2';
+      info.textContent = `Has ganado ${puntosGanados} punto${puntosGanados>1?'s':''}!`;
+      resultPanel.appendChild(info);
+
+      const btnGroup = document.createElement('div');
+      btnGroup.className = 'd-flex justify-content-center gap-2';
+
+      const replay = document.createElement('button');
+      replay.className = 'btn btn-primary btn-sm';
+      replay.textContent = 'Reintentar';
+      replay.onclick = () => { resultPanel.innerHTML = ''; buildBoard(); };
+      btnGroup.appendChild(replay);
+
+  const toMain = document.createElement('button');
+  toMain.className = 'btn btn-success btn-sm';
+  toMain.textContent = 'Volver a la página principal';
+  
+  toMain.onclick = () => { window.location.href = '/Jardin/Essencial/principal.html'; };
+  btnGroup.appendChild(toMain);
+
+      resultPanel.appendChild(btnGroup);
+
+      
+      sendPoints(puntosGanados);
+
+      setTimeout(() => alert('🎉 ¡Felicitaciones! Lo lograste 🐾\nPuntos: ' + puntosGanados), 400);
+    }
+
+    startBtn.addEventListener('click', buildBoard);
+    solveBtn.addEventListener('click', () => {
+      tiles.forEach(t => t.dataset.pos = t.dataset.index);
+      renderTiles();
+      resetTimer();
+      moves = 0;
+      updateMoves();
+    });
+
+    
+    async function sendPoints(points) {
+      const nombre = localStorage.getItem('usuario');
+      if (!nombre) return console.warn('No hay usuario en localStorage, puntos no enviados');
+      try {
+        const resp = await fetch('/Jardin/Essencial/Excepcional/sumar_puntos.php', {
+          method: 'POST',
+          body: new URLSearchParams({ nombre, puntos: points })
+        });
+        const data = await resp.json();
+        console.log('Respuesta sumar_puntos:', data);
+        if (data && typeof data.puntos !== 'undefined') {
+          localStorage.setItem('puntos', data.puntos);
+        }
+      } catch (err) {
+        console.error('Error enviando puntos:', err);
+      }
+    }
+  </script>
+</body>
+</html>
