@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juego de Memoria 2x5</title>
+<link rel="stylesheet" href="/static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/css/bootstrap.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Chewy&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body {
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4, #bc8ef8, #a6c1ee);
+    background-size: 400% 400%;
+    animation: fondo 12s ease infinite;
+    font-family: 'Chewy', cursive;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+  }
+
+  @keyframes fondo {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+  }
+
+  h1 {
+    font-size: 2.8rem;
+    color: #fff;
+    text-shadow: 3px 3px 0 #4f3ba8, 6px 6px 10px rgba(0,0,0,0.3);
+    margin-bottom: 15px;
+  }
+
+  #timerBarContainer {
+    width: 90%;
+    height: 25px;
+    background-color: #ffe6f2;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  }
+
+  #timerBar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+    transition: width 0.2s linear;
+  }
+
+  .memory-card {
+    aspect-ratio: 1/1;
+    background-color: #ffb6c1;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    cursor: pointer;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease, box-shadow 0.3s;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+  }
+
+  .memory-card:hover {
+    transform: scale(1.05);
+  }
+
+  .memory-card.flipped {
+    background-color: #fff;
+    transform: rotateY(180deg);
+  }
+
+  .memory-card .front, .memory-card .back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .memory-card .back {
+    background-color: #aa69ff;
+  }
+
+  .memory-card .front {
+    transform: rotateY(180deg);
+  }
+
+  #gameBoard {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 15px;
+  }
+
+  @media (max-width: 768px) {
+    #gameBoard {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      padding: 10px;
+    }
+    .memory-card {
+      font-size: clamp(1rem, 4vw, 2.5rem);
+    }
+    h1 {
+      font-size: 2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #gameBoard {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      padding: 5px;
+    }
+    .memory-card {
+      font-size: clamp(0.8rem, 3.5vw, 2rem);
+    }
+    h1 {
+      font-size: 1.8rem;
+    }
+    #timerBarContainer {
+      width: 95%;
+      height: 20px;
+    }
+  }
+  
+  .modal-content {
+    background-color: #fff0f5;
+    border-radius: 20px;
+    border: 3px solid #aa69ff;
+    text-align: center;
+  }
+
+  #modalTitle {
+    color: #4f3ba8;
+    font-size: 2rem;
+    text-shadow: 2px 2px 0 #fff;
+  }
+
+  #modalEmoji {
+    font-size: 3rem;
+  }
+
+  button.btn {
+    border-radius: 15px;
+    background-color: #ab73f3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    transition: transform 0.2s, background 0.2s;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+  }
+
+  button.btn:hover {
+    transform: scale(1.1);
+    background-color: #4f3ba8;
+  }
+</style>
+</head>
+<body>
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8 text-center">
+      <h1 class="mb-4">🎉 Juego de Memoria 🍎</h1>
+
+      <div id="timerBarContainer" class="mx-auto">
+        <div id="timerBar"></div>
+      </div>
+
+      <div id="gameBoard" class="mt-4"></div>
+    </div>
+  </div>
+</div>
+
+ 
+<div class="modal fade" id="endModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-4">
+      <h2 id="modalTitle"></h2>
+      <div id="modalEmoji" class="my-3"></div>
+      <div id="modalButtons" class="d-flex justify-content-center gap-3 flex-wrap"></div>
+    </div>
+  </div>
+</div>
+
+ 
+<audio id="flipSound" src="flip.mp3" preload="auto"></audio>
+<audio id="matchSound" src="match.mp3" preload="auto"></audio>
+<audio id="failSound" src="fail.mp3" preload="auto"></audio>
+<audio id="winSound" src="win.mp3" preload="auto"></audio>
+<audio id="loseSound" src="lose.mp3" preload="auto"></audio>
+
+<script src="/static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"></script>
+<script src="/essencial/js/memoria_2x5.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juego de Memoria 4x3</title>
+<link rel="stylesheet" href="/static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/css/bootstrap.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Chewy&display=swap');
+  body {
+    background: linear-gradient(135deg, #e4bfe9, #8c52ff);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    font-family: 'Chewy', cursive;
+    color: white;
+  }
+
+  h1 {
+    text-shadow: 3px 3px 0 #4f3ba4;
+    font-size: 2.8rem;
+    margin-top: 1rem;
+  }
+
+  #timerBarContainer {
+    width: 90%;
+    max-width: 600px;
+    height: 25px;
+    background-color: #fff;
+    border-radius: 12px;
+    margin: 1rem auto;
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 2rem;
+    }
+    .memory-card {
+      font-size: clamp(1rem, 4vw, 2.5rem);
+    }
+    #timerBarContainer {
+      width: 95%;
+      height: 20px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 1.8rem;
+    }
+    .memory-card {
+      font-size: clamp(0.8rem, 3.5vw, 2rem);
+    }
+    .modal-dialog {
+      margin: 0.5rem;
+    }
+    .btn {
+      padding: 8px 16px;
+      font-size: 0.9rem;
+    }
+  }
+
+  #timerBar {
+    height: 100%;
+    width: 100%;
+    background-color: #28a745;
+    transition: width 0.2s linear, background-color 0.2s;
+  }
+
+   .memory-card {
+    aspect-ratio: 1/1;
+    background-color: #aa69ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    cursor: pointer;
+    border-radius: 16px;
+    user-select: none;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.25);
+    margin: 8px;
+    max-width: 100px;
+  }
+
+  /* Force columns to a fixed width so cards group together centered */
+  #gameBoard {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Make each bootstrap column a fixed box so rows don't stretch across the whole page */
+  #gameBoard .row > .col-6.col-md-3,
+  #gameBoard .row > .col-3.col-sm-3.col-md-2,
+  #gameBoard .row > .col-3 {
+    flex: 0 0 140px;
+    max-width: 140px;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  /* Make the card fill its column */
+  #gameBoard .memory-card {
+    margin: 0;
+    max-width: 140px;
+    width: 100%;
+  }
+
+  .memory-card.flipped {
+    background-color: #fff;
+    transform: rotateY(180deg);
+    cursor: default;
+  }
+
+  .memory-card .front, .memory-card .back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .memory-card .front {
+    transform: rotateY(180deg);
+    font-size: clamp(1.5rem, 6vw, 3rem);
+  }
+
+  .memory-card .back {
+    background-color: #4f3ba4;
+    border-radius: 16px;
+  }
+
+  .disabled { pointer-events: none; }
+
+  .modal-content {
+    border-radius: 20px;
+    text-align: center;
+  }
+
+  .btn {
+    font-family: 'Chewy', cursive;
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+      <h1 class="text-center mb-4">🍎 Juego de Memoria 4x3 🍏</h1>
+      
+      <div id="timerBarContainer" class="mx-auto mb-4">
+        <div id="timerBar"></div>
+      </div>
+
+      <div id="gameBoard" class="px-2 px-md-4"></div>
+    </div>
+  </div>
+</div>
+
+ 
+<div class="modal fade" id="endModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered text-center">
+    <div class="modal-content p-4">
+      <h2 id="modalTitle" class="mb-3"></h2>
+      <div id="modalEmoji" class="mb-3" style="font-size:3rem;"></div>
+      <div id="modalImageContainer" class="mb-3"></div>
+      <div id="modalButtons" class="d-flex justify-content-center gap-3 flex-wrap"></div>
+    </div>
+  </div>
+</div>
+
+ 
+<audio id="flipSound" src="flip.mp3" preload="auto"></audio>
+<audio id="matchSound" src="match.mp3" preload="auto"></audio>
+<audio id="failSound" src="fail.mp3" preload="auto"></audio>
+<audio id="winSound" src="win.mp3" preload="auto"></audio>
+<audio id="loseSound" src="lose.mp3" preload="auto"></audio>
+
+<script src="/static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"></script>
+<script src="/essencial/js/memoria_4x3.js"></script>
+</body>
+</html>
+
+

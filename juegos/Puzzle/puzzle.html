@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rompecabezas de Animales 🐻🌳</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+    body {
+      background: linear-gradient(to bottom, #a8e6cf 0%, #dcedc1 100%);
+      font-family: 'Fredoka One', cursive;
+      color: #3c3c3c;
+      user-select: none;
+      overflow-x: hidden;
+    }
+    h4 { color: #2e7d32; text-shadow: 1px 1px #fff; }
+    .game-wrap { max-width: 900px; margin: 20px auto; }
+    .card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(var(--cols), 1fr);
+      gap: 10px;
+      touch-action: manipulation;
+    }
+    .tile {
+      aspect-ratio: 1/1;
+      border-radius: 18px;
+      border: 3px solid #8d6e63;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+      background-size: calc(var(--cols) * 100%) calc(var(--cols) * 100%);
+      background-repeat: no-repeat;
+      transition: transform .15s ease, border-color .2s;
+    }
+    .tile.selected { transform: scale(1.05); border-color: #4caf50; }
+    .btn-big { padding: 0.8rem 1rem; font-size: 1.1rem; border-radius: 12px; }
+    .btn-primary { background-color: #81c784; border: none; }
+    .btn-primary:hover { background-color: #66bb6a; }
+    .confetti {
+      position: fixed; width: 10px; height: 10px; background: #ffeb3b;
+      animation: fall 2s linear infinite; z-index: 999;
+    }
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container game-wrap">
+    <div class="card p-3">
+      <h4>🦁 Rompecabezas de Animales 🐘</h4>
+      <p>Cada vez que empieces, aparecerá un animal diferente. ¡Tocá las piezas para ordenarlas!</p>
+
+      <div class="row gy-3">
+        <div class="col-12 col-md-8">
+          <div id="board" class="board"></div>
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label">Tamaño del rompecabezas</label>
+          <select id="sizeSelect" class="form-select mb-3">
+            <option value="2">2 x 2 (fácil)</option>
+            <option value="3" selected>3 x 3</option>
+            <option value="4">4 x 4 (difícil)</option>
+          </select>
+
+          <div class="d-grid gap-2">
+            <button id="startBtn" class="btn btn-primary btn-big">🌳 Iniciar / Reiniciar</button>
+            <button id="solveBtn" class="btn btn-outline-success">🦋 Mostrar solución</button>
+          </div>
+
+          <div id="animalName" class="mt-3 fw-bold text-success text-center fs-5"></div>
+          <div id="moves" class="mt-2">Movimientos: 0</div>
+          <div id="time">Tiempo: 00:00</div>
+          <div id="resultPanel" class="mt-3 text-center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/essencial/js/puzzle.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trivia de Animales para Niños</title>
+  <link rel="stylesheet" href="/jardin-test/static/bootstrap-5.3.7-dist/bootstrap-5.3.7-dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Chewy&display=swap');
+
+    body {
+      font-family: 'Chewy', cursive;
+      background: linear-gradient(180deg, #ffe6b3, #ffcc80);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: #fff8e1;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      padding: 30px;
+      max-width: 900px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #ff9800;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px #fff;
+    }
+
+    .animal-img {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .question {
+      font-size: 1.5rem;
+      text-align: center;
+      color: #5d4037;
+    }
+
+    .choices button {
+      font-size: 1.2rem;
+      width: 100%;
+      margin: 10px 0;
+      border-radius: 15px;
+      border: none;
+      background-color: #ffe0b2;
+      color: #5d4037;
+      transition: 0.3s;
+    }
+
+    .choices button:hover {
+      background-color: #ffcc80;
+      transform: scale(1.05);
+    }
+
+    .choices .correct {
+      background-color: #a5d6a7 !important;
+      color: #2e7d32 !important;
+    }
+
+    .choices .wrong {
+      background-color: #ef9a9a !important;
+      color: #b71c1c !important;
+    }
+
+    #feedback {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 10px;
+      color: #6d4c41;
+      min-height: 30px;
+    }
+
+    .progress-bar {
+      background-color: #ffb74d !important;
+    }
+
+    .results {
+      display: none;
+      text-align: center;
+      font-size: 1.5rem;
+      color: #5d4037;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container text-center">
+    <h1>🐾 Trivia de Animales 🐾</h1>
+
+    <div id="game">
+      <img src="images/leon.jpg" alt="animal" id="animalImg" class="animal-img">
+      <p class="question" id="question">¿Qué animal es este?</p>
+
+      <div class="choices" id="choices"></div>
+
+      <div class="mt-3">
+        <div class="progress" style="height: 20px;">
+          <div class="progress-bar" id="progBar" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div id="feedback"></div>
+      <div class="results" id="results">
+        <h3>🎉 Resultado 🎉</h3>
+        <p id="finalScore"></p>
+        <p id="finalText"></p>
+        <button class="btn btn-warning text-white fs-5" id="restart">Jugar otra vez</button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="soundCorrect" src="sounds/match.mp3" preload="auto"></audio>
+  <audio id="soundWrong" src="sounds/wrong.mp3" preload="auto"></audio>
+  <audio id="soundEnd" src="sounds/win.mp3" preload="auto"></audio>
+
+  <script>
+    const QUESTIONS = [
+      {q: '¿Qué animal ruge y es el rey de la selva?', img: 'images/leon.jpg', choices:['Tigre','León','Lobo','Elefante'], a:1},
+      {q: '¿Qué animal tiene una trompa muy larga?', img: 'images/elefante.jpg', choices:['Elefante','Hipopótamo','Rinoceronte','Camello'], a:0},
+      {q: '¿Qué animal tiene el cuello más largo?', img: 'images/jirafa.jpg', choices:['Jirafa','Cebra','Llama','Caballo'], a:0},
+      {q: '¿Qué animal tiene rayas negras y blancas?', img: 'images/cebra.jpg', choices:['Cebra','Tigre','Gato','Perro'], a:0},
+      {q: '¿Qué animal vive en el agua y tiene ocho brazos?', img: 'images/pulpo.jpg', choices:['Pulpo','Calamar','Pez','Cangrejo'], a:0},
+      {q: '¿Qué animal dice "muu" y nos da leche?', img: 'images/vaca.jpg', choices:['Cabra','Oveja','Vaca','Cerdo'], a:2},
+      {q: '¿Qué animal salta y tiene una bolsa para su cría?', img: 'images/canguro.jpg', choices:['Koala','Canguro','Ratón','Zorro'], a:1},
+      {q: '¿Qué animal vive en el hielo y no vuela?', img: 'images/pinguino.jpg', choices:['Gaviota','Foca','Pingüino','Lobo marino'], a:2},
+      {q: '¿Qué animal tiene una gran melena y vive en África?', img: 'images/leon2.jpg', choices:['León','Tigre','Oso','Guepardo'], a:0},
+      {q: '¿Qué animal es muy lento y lleva su casa en la espalda?', img: 'images/caracol.jpg', choices:['Caracol','Tortuga','Erizo','Cangrejo'], a:0}
+    ];
+
+    let index = 0, score = 0;
+
+    const animalImg = document.getElementById('animalImg');
+    const questionEl = document.getElementById('question');
+    const choicesEl = document.getElementById('choices');
+    const feedback = document.getElementById('feedback');
+    const results = document.getElementById('results');
+    const finalScore = document.getElementById('finalScore');
+    const finalText = document.getElementById('finalText');
+    const restart = document.getElementById('restart');
+    const progBar = document.getElementById('progBar');
+
+    const soundCorrect = document.getElementById('soundCorrect');
+    const soundWrong = document.getElementById('soundWrong');
+    const soundEnd = document.getElementById('soundEnd');
+
+    function loadQuestion() {
+      if(index >= QUESTIONS.length) return endGame();
+      const q = QUESTIONS[index];
+      animalImg.src = q.img;
+      questionEl.textContent = q.q;
+      choicesEl.innerHTML = '';
+      q.choices.forEach((choice, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-light';
+        btn.textContent = choice;
+        btn.onclick = () => selectChoice(i, q.a, btn);
+        choicesEl.appendChild(btn);
+      });
+      feedback.textContent = '';
+    }
+
+    function selectChoice(i, correct, btn) {
+      const buttons = choicesEl.querySelectorAll('button');
+      buttons.forEach(b => b.disabled = true);
+      if(i === correct) {
+        btn.classList.add('correct');
+        feedback.textContent = '¡Muy bien! 🥳';
+        score++;
+        soundCorrect.play();
+  animalImg.classList.add('animate__animated', 'animate__tada');
+        setTimeout(() => animalImg.classList.remove('animate__animated', 'animate__tada'), 1000);
+      } else {
+        btn.classList.add('wrong');
+        buttons[correct].classList.add('correct');
+        feedback.textContent = 'Ups... intenta la próxima. 😅';
+        soundWrong.play();
+      }
+      setTimeout(nextQuestion, 1000);
+    }
+
+    function nextQuestion() {
+      index++;
+      progBar.style.width = (index / QUESTIONS.length * 100) + '%';
+      if(index < QUESTIONS.length) loadQuestion();
+      else endGame();
+    }
+
+    function endGame() {
+      results.style.display = 'block';
+      questionEl.style.display = 'none';
+      choicesEl.style.display = 'none';
+      animalImg.style.display = 'none';
+      feedback.textContent = '';
+      finalScore.textContent = `Tu puntaje: ${score} / ${QUESTIONS.length}`;
+      finalText.textContent = score === QUESTIONS.length ? '¡Excelente! 🌟' : '¡Muy bien hecho! 🐾';
+      soundEnd.play();
+    }
+
+    restart.onclick = () => location.reload();
+
+    loadQuestion();
+  </script>
+</body>
+</html>
+
+
